@@ -1,3 +1,0 @@
-../Lua/lzio.c:23:5:luaZ_fill	3
-../Lua/lzio.c:38:6:luaZ_init	1
-../Lua/lzio.c:48:8:luaZ_read	4

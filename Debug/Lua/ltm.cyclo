@@ -1,8 +1,0 @@
-../Lua/ltm.c:37:6:luaT_init	2
-../Lua/ltm.c:59:15:luaT_gettm	2
-../Lua/ltm.c:70:15:luaT_gettmbyobj	4
-../Lua/ltm.c:90:13:luaT_objtypename	6
-../Lua/ltm.c:102:6:luaT_callTM	4
-../Lua/ltm.c:124:5:luaT_callbinTM	3
-../Lua/ltm.c:135:6:luaT_trybinTM	7
-../Lua/ltm.c:158:5:luaT_callorderTM	5

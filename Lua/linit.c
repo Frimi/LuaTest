@@ -1,5 +1,5 @@
 /*
-** $Id: linit.c,v 1.39 2016/12/04 20:17:24 roberto Exp $
+** $Id: linit.c $
 ** Initialization of libraries for lua.c and other clients
 ** See Copyright Notice in lua.h
 */
@@ -33,7 +33,7 @@
 
 #include "lualib.h"
 #include "lauxlib.h"
-
+//external includes
 #include "luaInterface.h"
 
 /*
@@ -41,15 +41,19 @@
 ** program
 */
 static const luaL_Reg loadedlibs[] = {
-  {"_G", luaopen_base},
+  {LUA_GNAME, luaopen_base},
+  {LUA_LOADLIBNAME, luaopen_package},
+  {LUA_COLIBNAME, luaopen_coroutine},
   {LUA_TABLIBNAME, luaopen_table},
+  {LUA_IOLIBNAME, luaopen_io},
+  {LUA_OSLIBNAME, luaopen_os},
   {LUA_STRLIBNAME, luaopen_string},
-#ifdef LUA_WITH_MATH
   {LUA_MATHLIBNAME, luaopen_math},
-#endif
-#ifdef LUA_INTERFACE_LIBS
+  {LUA_UTF8LIBNAME, luaopen_utf8},
+  {LUA_DBLIBNAME, luaopen_debug},
+  #ifdef LUA_INTERFACE_LIBS
   LUA_INTERFACE_LIBS,
-#endif
+  #endif
   {NULL, NULL}
 };
 

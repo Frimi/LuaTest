@@ -12,7 +12,6 @@ static const char* script1="function script1Function ()\n\
 	local resultTable = uc.func2(array)\n\
 	print('test print:', 'string', 3, '\\n')\n\
 	print('resultTable1: '.. tostring(resultTable[0]) .. '  resultTable2: '.. tostring(resultTable[1]) .. '\\n')\n\
-	print('NANANANANANANNANANANANANNANANNANA\\n')\n\
 	print('heap usage before collect: ' .. tostring(collectgarbage('count')*1024) .. '\\n')\n\
 	collectgarbage('collect')\n\
 	print('heap usage after collect: ' .. tostring(collectgarbage('count')*1024) .. '\\n')\n\

@@ -1,3 +1,0 @@
-../Lua/lmem.c:48:7:luaM_growaux_	4
-../Lua/lmem.c:68:9:luaM_toobig	0
-../Lua/lmem.c:77:7:luaM_realloc_	5

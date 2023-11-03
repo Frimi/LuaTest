@@ -26,12 +26,10 @@
 #include "lualib.h"
 #include "helperScript.h"
 #include "script1.h"
-#include "script3.h"
 #include "script2.h"
 #include "luaInterface.h"
 #include "lauxlib.h"
 #include "luaHelper.h"
-#include "printFreeHeap.h"
 #define PUTCHAR_PROTOTYPE int __io_putchar(uint8_t ch)
 /* USER CODE END Includes */
 
@@ -151,7 +149,6 @@ int main(void)
 		  lua_gc(L, LUA_GCCOLLECT, 0); //collect garbage
 
 		  lua_writeline();
-		  printMinimumFreeHeap();
 
 		  lua_writestringWithoutsize("\n****************************************************************************\n");
 

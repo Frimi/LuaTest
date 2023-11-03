@@ -1,6 +1,0 @@
-../Lua/helper/luaHeap.c:75:7:luaMalloc	12
-../Lua/helper/luaHeap.c:178:6:luaFree	4
-../Lua/helper/luaHeap.c:213:8:LuaGetFreeHeapSize	1
-../Lua/helper/luaHeap.c:219:8:LuaGetMinimumEverFreeHeapSize	1
-../Lua/helper/luaHeap.c:226:13:LuaHeapInit	2
-../Lua/helper/luaHeap.c:274:13:LuaInsertBlockIntoFreeList	6

@@ -1,0 +1,17 @@
+# .gitignore for Simplicity Studio.
+*.obj
+*__i
+*.lst
+*.mk
+*.lnp
+*.m51
+*.omf
+*.d
+*.o
+GNU ARM *
+.pdm
+.trash
+.uceditor
+*.sh
+*.crc
+Debug/

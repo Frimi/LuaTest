@@ -1,8 +1,0 @@
-../Lua/lfunc.c:25:11:luaF_newCclosure	1
-../Lua/lfunc.c:33:11:luaF_newLclosure	2
-../Lua/lfunc.c:45:6:luaF_initupvals	2
-../Lua/lfunc.c:57:8:luaF_findupval	5
-../Lua/lfunc.c:83:6:luaF_close	6
-../Lua/lfunc.c:99:8:luaF_newproto	1
-../Lua/lfunc.c:125:6:luaF_freeproto	1
-../Lua/lfunc.c:140:13:luaF_getlocalname	5
