@@ -1,0 +1,7 @@
+../luaProject/luaInterface.c:16:6:luaAbort	8	static
+../luaProject/luaInterface.c:23:5:func1	32	static
+../luaProject/luaInterface.c:45:5:func2	32	static
+../luaProject/luaInterface.c:87:5:counter	16	static
+../luaProject/luaInterface.c:96:5:scriptSemaphore	16	static
+../luaProject/luaInterface.c:101:5:taskDelay	24	static
+../luaProject/luaInterface.c:118:16:luaopen_uc	16	static

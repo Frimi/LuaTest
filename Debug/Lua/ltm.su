@@ -1,0 +1,8 @@
+../Lua/ltm.c:37:6:luaT_init	32	static
+../Lua/ltm.c:59:15:luaT_gettm	32	static
+../Lua/ltm.c:70:15:luaT_gettmbyobj	32	static
+../Lua/ltm.c:90:13:luaT_objtypename	24	static
+../Lua/ltm.c:102:6:luaT_callTM	56	static
+../Lua/ltm.c:124:5:luaT_callbinTM	40	static
+../Lua/ltm.c:135:6:luaT_trybinTM	40	static
+../Lua/ltm.c:158:5:luaT_callorderTM	32	static

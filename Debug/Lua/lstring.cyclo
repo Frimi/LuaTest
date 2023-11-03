@@ -1,0 +1,13 @@
+../Lua/lstring.c:40:5:luaS_eqlngstr	4
+../Lua/lstring.c:49:14:luaS_hash	2
+../Lua/lstring.c:58:14:luaS_hashlongstr	2
+../Lua/lstring.c:71:6:luaS_resize	6
+../Lua/lstring.c:103:6:luaS_clearcache	4
+../Lua/lstring.c:116:6:luaS_init	3
+../Lua/lstring.c:133:17:createstrobj	1
+../Lua/lstring.c:147:10:luaS_createlngstrobj	1
+../Lua/lstring.c:154:6:luaS_remove	2
+../Lua/lstring.c:167:17:internshrstr	7
+../Lua/lstring.c:199:10:luaS_newlstr	2
+../Lua/lstring.c:219:10:luaS_new	4
+../Lua/lstring.c:236:8:luaS_newudata	1

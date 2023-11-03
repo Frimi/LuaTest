@@ -1,0 +1,6 @@
+../Lua/helper/luaHeap.c:75:7:luaMalloc	32	static
+../Lua/helper/luaHeap.c:178:6:luaFree	24	static
+../Lua/helper/luaHeap.c:213:8:LuaGetFreeHeapSize	4	static
+../Lua/helper/luaHeap.c:219:8:LuaGetMinimumEverFreeHeapSize	4	static
+../Lua/helper/luaHeap.c:226:13:LuaHeapInit	24	static
+../Lua/helper/luaHeap.c:274:13:LuaInsertBlockIntoFreeList	24	static

@@ -1,0 +1,14 @@
+../Lua/lstate.c:91:21:makeseed	1
+../Lua/lstate.c:109:6:luaE_setdebt	2
+../Lua/lstate.c:119:11:luaE_extendCI	1
+../Lua/lstate.c:133:6:luaE_freeCI	2
+../Lua/lstate.c:148:6:luaE_shrinkCI	3
+../Lua/lstate.c:162:13:stack_init	2
+../Lua/lstate.c:182:13:freestack	2
+../Lua/lstate.c:195:13:init_registry	1
+../Lua/lstate.c:214:13:f_luaopen	1
+../Lua/lstate.c:232:13:preinit_thread	1
+../Lua/lstate.c:253:13:close_state	1
+../Lua/lstate.c:267:6:luaE_freethread	1
+../Lua/lstate.c:277:20:lua_newstate	4
+../Lua/lstate.c:323:14:lua_close	1

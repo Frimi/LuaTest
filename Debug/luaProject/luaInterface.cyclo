@@ -1,0 +1,7 @@
+../luaProject/luaInterface.c:16:6:luaAbort	1
+../luaProject/luaInterface.c:23:5:func1	1
+../luaProject/luaInterface.c:45:5:func2	2
+../luaProject/luaInterface.c:87:5:counter	1
+../luaProject/luaInterface.c:96:5:scriptSemaphore	1
+../luaProject/luaInterface.c:101:5:taskDelay	1
+../luaProject/luaInterface.c:118:16:luaopen_uc	1
