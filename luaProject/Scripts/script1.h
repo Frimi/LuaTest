@@ -1,24 +1,38 @@
-static const char* script1="function script1Function ()\n\
-	print('\\nscript1: ' .. tostring(uc.counter()) ..'\\n')\n\
-	includedScript()\n\
-	local example = 'an example string'\n\
-	for el in string.gmatch(example, '%S+') do\n\
-		print(el .. ' ')\n\
-	end\n\
-	print('\\n')\n\
-	local result1, result2 = uc.func1('Testmessage')\n\
-	print('result1: '.. tostring(result1) .. '  result2: '.. tostring(result2) .. '\\n')\n\
-	local array = {0,1,2,3,4}\n\
-	local resultTable = uc.func2(array)\n\
-	print('test print:', 'string', 3, '\\n')\n\
-	print('resultTable1: '.. tostring(resultTable[0]) .. '  resultTable2: '.. tostring(resultTable[1]) .. '\\n')\n\
-	print('heap usage before collect: ' .. tostring(collectgarbage('count')*1024) .. '\\n')\n\
-	collectgarbage('collect')\n\
-	print('heap usage after collect: ' .. tostring(collectgarbage('count')*1024) .. '\\n')\n\
+static const char *script1 = "local function get_current_tick()\n\
+    return uc.get_tick()\n\
 end\n\
-for loopCounter=0,2 do\n\
-	uc.scriptSemaphore(1)\n\
-	print(pcall(script1Function), '\\n')\n\
-	uc.scriptSemaphore(0)\n\
-	uc.taskDelay(1)\n\
-end";
+\n\
+local function calcular_tempo_passado(tempo_inicial)\n\
+    local tempo_atual = get_current_tick()\n\
+    local diferenca = tempo_atual - tempo_inicial\n\
+    return diferenca\n\
+end\n\
+\n\
+local function verificar_status_ignicao()\n\
+    return uc.button_status()\n\
+end\n\
+\n\
+local tempo_inicial = get_current_tick()\n\
+local cond = true\n\
+\n\
+coro = coroutine.create(function()\n\
+    while cond do\n\
+        local status_botao = verificar_status_ignicao()\n\
+\n\
+        if not status_botao then\n\
+            tempo_inicial = get_current_tick()  -- Ignição OFF, redefinir o tempo inicial\n\
+			print(\"Ignicao OFF redefinir tempo\")\n\
+        else\n\
+            local diferenca = calcular_tempo_passado(tempo_inicial)\n\
+\n\
+            if diferenca >= 15000 then\n\
+                print(\"Ignicao ON e passaram 15 segundos\")\n\
+                tempo_inicial = get_current_tick()\n\
+            end\n\
+        end\n\
+        coroutine.yield()\n\
+    end\n\
+end)\n\
+\n\
+coroutine.resume(coro)";
+

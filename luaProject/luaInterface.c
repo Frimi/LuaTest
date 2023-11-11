@@ -8,10 +8,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "main.h"
 
 //#include "FreeRTOS.h"
 //#include "semphr.h"
-
+bool panic_state = false;
 //This function is called by Lua cannot handle an occured error.
 void luaAbort(void)
 {
@@ -19,6 +20,35 @@ void luaAbort(void)
   while(1){}
 }
 
+int get_tick(lua_State *L)
+{
+  uint32_t tick = HAL_GetTick();
+  // Empurra o resultado (valor do tick) para a pilha Lua
+  lua_pushinteger(L, tick);
+
+  printf("TICK:%lu \n", tick);
+
+  // Indica que uma variável (1 valor) está sendo retornada para Lua
+  return 1;
+}
+
+int button_status(lua_State *L)
+{
+  // Empurra o resultado para a pilha Lua
+  lua_pushboolean(L, button_state());
+
+  // Indica que uma variável (1 valor) está sendo retornada para Lua
+  return 1;
+}
+
+int panic_status(lua_State *L)
+{
+  // Empurra o resultado para a pilha Lua
+  lua_pushboolean(L, panic_state);
+
+  // Indica que uma variável (1 valor) está sendo retornada para Lua
+  return 1;
+}
 
 int func1(lua_State *L)
 {
@@ -111,6 +141,9 @@ static const luaL_Reg uC_funcs[] = {
   {"counter", counter},
   {"scriptSemaphore", scriptSemaphore},
   {"taskDelay", taskDelay},
+  {"get_tick", get_tick},
+  {"button_status", button_status},
+  {"panic_status", panic_status},
   {NULL, NULL}
 };
 
