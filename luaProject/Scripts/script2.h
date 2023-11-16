@@ -12,6 +12,24 @@ local function verificar_status_ignicao()\n\
     return uc.button_status()\n\
 end\n\
 \n\
+function switch(caseTable, caseValue)\n\
+    local caseFunction = caseTable[caseValue] or caseTable['default']\n\
+    if caseFunction then\n\
+        caseFunction()\n\
+    end\n\
+end\n\
+\n\
+local events = {\n\
+    gnss_event = function()\n\
+        local positionTable = uc.position()\n\
+        print('Latitude:', positionTable.latitude)\n\
+        print('Longitude:', positionTable.longitude)\n\
+    end,\n\
+    default = function()\n\
+        print('Executando o caso padrao')\n\
+    end\n\
+}\n\
+\n\
 local tempo_inicial = get_current_tick()\n\
 local cond = true\n\
 \n\
@@ -19,18 +37,20 @@ coro = coroutine.create(function()\n\
     while cond do\n\
         local status_botao = verificar_status_ignicao()\n\
 \n\
-        if status_botao then\n\
-            tempo_inicial = get_current_tick()  -- Ignição ON, redefinir o tempo inicial\n\
-		    print(\"Ignicao OFF redefinir tempo\")\n\
+        if not status_botao then\n\
+            tempo_inicial = get_current_tick()  -- Ignição OFF, redefinir o tempo inicial\n\
+            print('Ignicao OFF redefinir tempo')\n\
         else\n\
             local diferenca = calcular_tempo_passado(tempo_inicial)\n\
 \n\
-            if diferenca >= 60000 then\n\
-                print(\"Ignicao OFF e passaram 60 segundos\")\n\
+            if diferenca >= 15000 then\n\
+                print('Ignicao ON e passaram 15 segundos')\n\
                 tempo_inicial = get_current_tick()\n\
             end\n\
         end\n\
-        coroutine.yield()\n\
+        event = coroutine.yield()\n\
+        print('event:', event)\n\
+		switch(events, event)\n\
     end\n\
 end)\n\
 \n\

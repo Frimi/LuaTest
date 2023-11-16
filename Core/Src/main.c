@@ -173,11 +173,20 @@ int main(void)
     {
       int nres;
 
-      HAL_Delay(10);
+      HAL_Delay(100);
 
       for (int i = 0; i < SCRIPT_COUNT; ++i)
       {
-        int resume_status = lua_resume(context.courotine[i], NULL, 0, &nres);
+          if(counter[i] % 100 == 99)
+          {
+            //Simula um evento de GNSS para o LUA a cada 10 segundos
+            lua_pushstring(context.courotine[i], "gnss_event");
+          }
+          else
+          {
+            lua_pushstring(context.courotine[i], "empty");
+          }
+        int resume_status = lua_resume(context.courotine[i], NULL, 1, &nres);
         if (resume_status != 0 && resume_status != LUA_YIELD)
         {
           const char *error_message = lua_tostring(context.courotine[i], -1);

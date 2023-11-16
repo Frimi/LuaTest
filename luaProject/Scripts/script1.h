@@ -30,7 +30,8 @@ coro = coroutine.create(function()\n\
                 tempo_inicial = get_current_tick()\n\
             end\n\
         end\n\
-        coroutine.yield()\n\
+        event = coroutine.yield()\n\
+		print(\"event:\", event)\n\
     end\n\
 end)\n\
 \n\
