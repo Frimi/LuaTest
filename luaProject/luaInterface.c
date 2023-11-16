@@ -135,6 +135,19 @@ int taskDelay(lua_State *L)
   return 0;
 }
 
+int position(lua_State *L)
+{
+  lua_newtable(L);
+
+  lua_pushnumber(L, 40.7128); // Substitua esse valor pela latitude desejada
+  lua_setfield(L, -2, "latitude");
+
+  lua_pushnumber(L, -74.0060); // Substitua esse valor pela longitude desejada
+  lua_setfield(L, -2, "longitude");
+
+  return 1;
+}
+
 static const luaL_Reg uC_funcs[] = {
   {"func1", func1},
   {"func2", func2},
@@ -144,6 +157,7 @@ static const luaL_Reg uC_funcs[] = {
   {"get_tick", get_tick},
   {"button_status", button_status},
   {"panic_status", panic_status},
+  {"position", position},
   {NULL, NULL}
 };
 

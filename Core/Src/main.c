@@ -24,7 +24,6 @@
 #include "stdio.h"
 #include "lua.h"
 #include "lualib.h"
-#include "helperScript.h"
 #include "script1.h"
 #include "script2.h"
 #include "script3.h"
@@ -42,6 +41,12 @@ typedef struct
   const char *nome;
   const char *script;
 } ScriptInfo;
+
+typedef struct
+{
+  lua_State *global[SCRIPT_COUNT];
+  lua_State *courotine[SCRIPT_COUNT];
+} LuaContext;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -77,36 +82,7 @@ PUTCHAR_PROTOTYPE
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-static void stackDump(lua_State *L)
-{
-  int i;
-  int top = lua_gettop(L);
-  for (i = 1; i <= top; i++)
-  { /* repeat for each level */
-    int t = lua_type(L, i);
-    switch (t)
-    {
 
-    case LUA_TSTRING: /* strings */
-      printf("`%s'", lua_tostring(L, i));
-      break;
-
-    case LUA_TBOOLEAN: /* booleans */
-      printf(lua_toboolean(L, i) ? "true" : "false");
-      break;
-
-    case LUA_TNUMBER: /* numbers */
-      printf("%f", lua_tonumber(L, i));
-      break;
-
-    default: /* other values */
-      printf("%s", lua_typename(L, t));
-      break;
-    }
-    printf("  "); /* put a separator */
-  }
-  printf("\n"); /* end the listing */
-}
 /* USER CODE END 0 */
 
 /**
@@ -153,8 +129,7 @@ int main(void)
     HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
     printf("Teste\n");
 
-    lua_State *L[SCRIPT_COUNT]; // Vetor de lua_State *
-    lua_State *coro[SCRIPT_COUNT];
+    LuaContext context;
     ScriptInfo scripts[SCRIPT_COUNT] = {
         {"script1", script1},
         {"script2", script2},
@@ -164,8 +139,8 @@ int main(void)
     // Criar estados Lua para cada script
     for (int i = 0; i < SCRIPT_COUNT; ++i)
     {
-      L[i] = luaL_newstate(); /* create state */
-      if (L[i] == NULL)
+      context.global[i] = luaL_newstate(); /* create state */
+      if (context.global[i] == NULL)
       {
         lua_writestring("Cannot create state: not enough memory", sizeof("Cannot create state: not enough memory") - 1);
         while (1)
@@ -175,12 +150,12 @@ int main(void)
       }
       else
       {
-        luaL_openlibs(L[i]);         /* open standard libraries */
-        lua_gc(L[i], LUA_GCSTOP, 0); // stop the automatic garbage collection
+        luaL_openlibs(context.global[i]);         /* open standard libraries */
+        lua_gc(context.global[i], LUA_GCSTOP, 0); // stop the automatic garbage collection
         HAL_Delay(10);
 
         // Executar script
-        if (dostring(L[i], scripts[i].script, scripts[i].nome) != LUA_OK)
+        if (dostring(context.global[i], scripts[i].script, scripts[i].nome) != LUA_OK)
         {
           lua_writestring("Error executing Lua script", sizeof("Error executing Lua script") - 1);
           while (1)
@@ -188,9 +163,9 @@ int main(void)
             HAL_Delay(1000);
           }
         }
-        lua_getglobal(L[i], "coro");
+        lua_getglobal(context.global[i], "coro");
         // Continua a execução do coroutine Lua
-        coro[i] = lua_tothread(L[i], -1);
+        context.courotine[i] = lua_tothread(context.global[i], -1);
       }
     }
     int counter[SCRIPT_COUNT] = {0};
@@ -198,18 +173,17 @@ int main(void)
     {
       int nres;
 
-      HAL_Delay(500);
+      HAL_Delay(10);
 
       for (int i = 0; i < SCRIPT_COUNT; ++i)
       {
-        int resume_status = lua_resume(coro[i], NULL, 0, &nres);
+        int resume_status = lua_resume(context.courotine[i], NULL, 0, &nres);
         if (resume_status != 0 && resume_status != LUA_YIELD)
         {
-          const char *error_message = lua_tostring(coro[i], -1);
-          return luaL_error(L[i], error_message);
+          const char *error_message = lua_tostring(context.courotine[i], -1);
+          return luaL_error(context.global[i], error_message);
         }
-
-        lua_gc(L[i], LUA_GCCOLLECT, 0); // collect garbage
+        lua_gc(context.global[i], LUA_GCCOLLECT, 0); // collect garbage
         counter[i]++;
         lua_writeline();
         printf("Counter %d\r\n", counter[i]);
