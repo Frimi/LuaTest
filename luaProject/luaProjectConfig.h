@@ -8,7 +8,6 @@
 
 //#define DONT_USE_LUA_HEAP_MANAGEMENT_FUNCTIONS
 
-
 #ifdef DONT_USE_LUA_HEAP_MANAGEMENT_FUNCTIONS
 //The FreeRTOS functions shall be used.
 

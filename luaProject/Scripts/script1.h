@@ -15,7 +15,7 @@ end\n\
 local tempo_inicial = get_current_tick()\n\
 local cond = true\n\
 \n\
-coro = coroutine.create(function()\n\
+coro1 = coroutine.create(function()\n\
     while cond do\n\
         local status_botao = verificar_status_ignicao()\n\
 \n\
@@ -35,5 +35,5 @@ coro = coroutine.create(function()\n\
     end\n\
 end)\n\
 \n\
-coroutine.resume(coro)";
+coroutine.resume(coro1)";
 

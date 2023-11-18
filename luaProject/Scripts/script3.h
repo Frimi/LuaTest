@@ -18,7 +18,7 @@ end\n\
 local tempo_inicial = get_current_tick()\n\
 local cond = true\n\
 \n\
-coro = coroutine.create(function()\n\
+coro3 = coroutine.create(function()\n\
     while cond do\n\
         local estado_panico = status_panico()\n\
 \n\
@@ -37,7 +37,7 @@ coro = coroutine.create(function()\n\
     end\n\
 end)\n\
 \n\
-coroutine.resume(coro)";
+coroutine.resume(coro3)";
 
 
 
