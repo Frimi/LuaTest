@@ -33,7 +33,6 @@
 #include "script7.h"
 #include "script8.h"
 #include "script9.h"
-#include "stdlib_amalg.h"
 #include "luaInterface.h"
 #include "lauxlib.h"
 #include "luaHelper.h"
@@ -94,41 +93,42 @@ PUTCHAR_PROTOTYPE
 /* USER CODE BEGIN 0 */
 void TrackSubtract(size_t size)
 {
-	memory_size -= size;
+  memory_size -= size;
 }
 
 void TrackAdd(size_t size)
 {
-	memory_size += size;
-	if(memory_size > 50000)
-		printf("TrackAdd: %d\r\n",size);
+  memory_size += size;
+  if (memory_size > 50000)
+    printf("TrackAdd: %d\r\n", size);
 }
-void* MyAlloc (void* ud, void* ptr, size_t osize, size_t nsize)
+void *MyAlloc(void *ud, void *ptr, size_t osize, size_t nsize)
 {
-    (void)ud; (void)osize;   // Not used
-    if (nsize == 0)
-    {
-        free(ptr);
-        TrackSubtract(osize);
-        return NULL;
-    }
+  (void)ud;
+  (void)osize; // Not used
+  if (nsize == 0)
+  {
+    free(ptr);
+    TrackSubtract(osize);
+    return NULL;
+  }
+  else
+  {
+    void *p = realloc(ptr, nsize);
+    TrackSubtract(osize);
+    if (p)
+      TrackAdd(nsize);
     else
-    {
-        void* p = realloc(ptr,nsize);
-        TrackSubtract(osize);
-        if (p)
-        	TrackAdd(nsize);
-        else
-        	__asm("NOP");
-        return p;
-    }
+      __asm("NOP");
+    return p;
+  }
 }
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -167,68 +167,53 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-    printf("Teste\n");
 
     LuaContext context;
-    ScriptInfo extraLibs[1] =
-    {
-    	{"stdlib_amalg", stdlib_amalg}, //https://github.com/lua-stdlib/lua-stdlib.git
-    };
     ScriptInfo scripts[SCRIPT_COUNT] = {
         {"script1", script1},
         {"script2", script2},
         {"script3", script3},
-		{"script4", script4},
-		{"script5", script5},
-		{"script6", script6},
-		{"script7", script7},
-		{"script8", script8},
-		{"script9", script9},
+        {"script4", script4},
+        {"script5", script5},
+        {"script6", script6},
+        {"script7", script7},
+        {"script8", script8},
+        {"script9", script9},
         // Adicione os scripts restantes aqui
     };
     char coroName[10] = {0};
     // Criar estados Lua para cada script
-      context.global = lua_newstate(&MyAlloc, 0); /* create state */
-      if (context.global == NULL)
+    context.global = lua_newstate(&MyAlloc, 0); /* create state */
+    if (context.global == NULL)
+    {
+      lua_writestring("Cannot create state: not enough memory", sizeof("Cannot create state: not enough memory") - 1);
+      while (1)
       {
-        lua_writestring("Cannot create state: not enough memory", sizeof("Cannot create state: not enough memory") - 1);
-        while (1)
-        {
-          HAL_Delay(1000);
-        }
+        HAL_Delay(1000);
       }
-      else
+    }
+    else
+    {
+      luaL_openlibs(context.global);         /* open standard libraries */
+      lua_gc(context.global, LUA_GCSTOP, 0); // stop the automatic garbage collection
+      HAL_Delay(10);
+      for (uint8_t i = 0; i < SCRIPT_COUNT; i++)
       {
-        luaL_openlibs(context.global);         /* open standard libraries */
-
-        if (dostring(context.global, extraLibs[0].script, extraLibs[0].nome) != LUA_OK)
-		{
-		  lua_writestring("Error executing Lua lib", sizeof("Error executing Lua lib") - 1);
-		  while (1)
-		  {
-			HAL_Delay(1000);
-		  }
-		}
-        lua_gc(context.global, LUA_GCSTOP, 0); // stop the automatic garbage collection
-        HAL_Delay(10);
-        for(uint8_t i = 0; i < SCRIPT_COUNT; i++)
+        // Executar script
+        if (dostring(context.global, scripts[i].script, scripts[i].nome) != LUA_OK)
         {
-			// Executar script
-			if (dostring(context.global, scripts[i].script, scripts[i].nome) != LUA_OK)
-			{
-			  lua_writestring("Error executing Lua script", sizeof("Error executing Lua script") - 1);
-			  while (1)
-			  {
-				HAL_Delay(1000);
-			  }
-			}
-			snprintf(coroName, sizeof(coroName), "coro%d", i+1);
-	        lua_getglobal(context.global, coroName);
-	        printf("%s\n", coroName);
-	        // Continua a execução do coroutine Lua
-	        context.courotine[i] = lua_tothread(context.global, -1);
+          lua_writestring("Error executing Lua script", sizeof("Error executing Lua script") - 1);
+          while (1)
+          {
+            HAL_Delay(1000);
+          }
         }
+        snprintf(coroName, sizeof(coroName), "coro%d", i + 1);
+        lua_getglobal(context.global, coroName);
+        printf("%s\n", coroName);
+        context.courotine[i] = lua_tothread(context.global, -1);
       }
+    }
     int counter[SCRIPT_COUNT] = {0};
     while (1)
     {
@@ -238,15 +223,14 @@ int main(void)
 
       for (int i = 0; i < SCRIPT_COUNT; ++i)
       {
-          if(counter[i] % 100 == 99)
-          {
-            //Simula um evento de GNSS para o LUA a cada 10 segundos
-            lua_pushstring(context.courotine[i], "gnss_event");
-          }
-          else
-          {
-            lua_pushstring(context.courotine[i], "empty");
-          }
+        if (counter[i] % 100 == 99)
+        {
+          lua_pushstring(context.courotine[i], "gnss_event");
+        }
+        else
+        {
+          lua_pushstring(context.courotine[i], "empty");
+        }
         int resume_status = lua_resume(context.courotine[i], NULL, 1, &nres);
         if (resume_status != 0 && resume_status != LUA_YIELD)
         {
@@ -267,24 +251,24 @@ int main(void)
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+ * @brief System Clock Configuration
+ * @retval None
+ */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-  */
+   */
   if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
   {
     Error_Handler();
   }
 
   /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
+   * in the RCC_OscInitTypeDef structure.
+   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
@@ -301,9 +285,8 @@ void SystemClock_Config(void)
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
@@ -316,10 +299,10 @@ void SystemClock_Config(void)
 }
 
 /**
-  * @brief UART4 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief UART4 Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_UART4_Init(void)
 {
 
@@ -347,14 +330,13 @@ static void MX_UART4_Init(void)
   /* USER CODE BEGIN UART4_Init 2 */
 
   /* USER CODE END UART4_Init 2 */
-
 }
 
 /**
-  * @brief USART2 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief USART2 Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_USART2_UART_Init(void)
 {
 
@@ -382,19 +364,18 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
-
 }
 
 /**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief GPIO Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+  /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -422,8 +403,8 @@ static void MX_GPIO_Init(void)
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+  /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
@@ -442,9 +423,9 @@ bool button_state()
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -456,14 +437,14 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
